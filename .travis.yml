@@ -11,12 +11,11 @@ env:
 
 jobs:
   include:
-    - stage: Build objects 
+    - stage: Build and push 
       if: (NOT (type IN (pull_request)))
       script:
         # build the release contents
         - docker run --rm -it -v $(pwd):/buildout taisun/ubuntu-build:ubuntu-bionic
-    - stage: Push release
       before_deploy:
         # Set up git user name and tag this commit
         - git config --local user.name $GIT_USERNAME
