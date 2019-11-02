@@ -26,5 +26,5 @@ echo "ca_directory=/etc/ssl/certs" > $DESTDIR/etc/wgetrc
 
 ## use full path in http logic to avoid busybox
 sed -i \
-	's/wget/\/bin\/wget/g' \
+	's/	wget/	\/bin\/wget/g' \
 	/lib/live/boot/9990-mount-http.sh
