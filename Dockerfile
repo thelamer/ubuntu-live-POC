@@ -4,16 +4,21 @@ FROM ubuntu:bionic
 ARG DEBIAN_FRONTEND="noninteractive"
 ENV XDG_CONFIG_HOME="/config/xdg"
 
+# add local files
+COPY /root /
+
 RUN \
  echo "**** install deps ****" && \
  apt-get update && \
  apt-get install -y \
-	p7zip-full \
+	curl \
 	initramfs-tools \
 	live-boot \
+	p7zip-full \
 	pixz \
 	psmisc \
-	transmission-cli && \
+	transmission-cli \
+	wget && \
  echo "**** install kernel ****" && \
  apt-get install -y \
 	linux-image-virtual && \
@@ -23,8 +28,5 @@ RUN \
 	/tmp/* \
 	/var/lib/apt/lists/* \
 	/var/tmp/*
-
-# add local files
-COPY /root /
 
 ENTRYPOINT [ "/build.sh" ]
