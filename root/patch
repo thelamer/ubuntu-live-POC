@@ -1,0 +1,54 @@
+--- scripts/casper.orig 2016-10-05 19:07:11.000000000 +0200
++++ scripts/casper      2016-10-05 19:26:58.000000000 +0200
+@@ -33,6 +33,10 @@ fi
+ parse_cmdline() {
+     for x in $(cat /proc/cmdline); do
+         case $x in
++            netboot=*)
++                export NETBOOT="${x#netboot=}";;
++            fetch=*)
++                export URL="${x#fetch=}";;
+             showmounts|show-cow)
+                 export SHOWMOUNTS='Yes' ;;
+             persistent)
+@@ -212,20 +216,31 @@ do_netmount() {
+         NFSROOT=${ROOTSERVER}:${ROOTPATH}
+     fi
+ 
+-    [ "$quiet" != "y" ] && log_begin_msg "Trying netboot from ${NFSROOT}"
+-
+-    if [ "${NETBOOT}" != "nfs" ] && do_cifsmount ; then
+-        rc=0
+-    elif do_nfsmount ; then
+-        NETBOOT="nfs"
+-        export NETBOOT
+-        rc=0
+-    fi
++    case ${NETBOOT} in
++        nfs)
++            [ "$quiet" != "y" ] && log_begin_msg "Trying netboot from ${NFSROOT}"
++            if do_nfsmount ; then rc=0; fi     ;;
++        cifs)
++            [ "$quiet" != "y" ] && log_begin_msg "Trying netboot from ${NFSROOT}"
++            if do_cifsmount ; then rc=0; fi ;;
++        http)
++            [ "$quiet" != "y" ] && log_begin_msg "Trying netboot from ${URL}"
++            if do_httpmount ; then rc=0; fi ;;
++    esac
+ 
+     [ "$quiet" != "y" ] && log_end_msg
+     return ${rc}
+ }
+ 
++do_httpmount() {
++    rc=1
++    mkdir -p ${mountpoint}
++    mount -t tmpfs -o size=`/bin/wget ${URL} --spider --server-response -O - 2>&1 | sed -ne '/Content-Length/{s/.*: //;p}'` tmpfs ${mountpoint}
++    mkdir -p ${mountpoint}/casper
++    if /bin/wget --progress=bar:force:noscroll ${URL} -O ${mountpoint}/casper/root.squashfs; then rc=0; fi
++    return ${rc}
++}
++
+ do_nfsmount() {
+     rc=1
+     modprobe "${MP_QUIET}" nfs

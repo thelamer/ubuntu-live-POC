@@ -12,8 +12,8 @@ transmission-cli -f $tmpfile $TORRENT
 cd /root/Downloads
 7z x ubuntu-*.iso
 mv casper/filesystem.squashfs /buildout/
-mv /boot/initrd* /buildout/initrd
-mv /boot/vmlinuz* /buildout/vmlinuz
+mv /boot/initrd.img-* /buildout/initrd
+mv /boot/vmlinuz-* /buildout/vmlinuz
 sha256sum ubuntu-*.iso | cut -c1-8 > /buildout/shasum
 chmod 777 /buildout/*
 

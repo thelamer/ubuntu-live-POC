@@ -11,14 +11,17 @@ RUN \
  echo "**** install deps ****" && \
  apt-get update && \
  apt-get install -y \
+	casper \
 	curl \
 	initramfs-tools \
-	live-boot \
 	p7zip-full \
+	patch \
 	pixz \
 	psmisc \
 	transmission-cli \
 	wget && \
+ echo "**** patch casper ****" && \
+ patch /usr/share/initramfs-tools/scripts/casper < /patch && \
  echo "**** install kernel ****" && \
  apt-get install -y \
 	linux-image-virtual && \
